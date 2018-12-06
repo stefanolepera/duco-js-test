@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import SearchBar from '../components/SearchBar/SearchBar';
 import ResultItem from '../components/ResultItem/ResultItem';
+import {
+    sortedFilms,
+    getFilmsByCharacter,
+    getCharacterDetails
+} from '../utils/FilterData';
 import { fetchCharacters, fetchFilms } from '../utils/Network';
 
 class AppContainer extends Component {
@@ -18,21 +23,16 @@ class AppContainer extends Component {
     componentDidMount() {
         fetchFilms()
             .then(res => {
-                console.log('films', res.data.results);
                 this.setState({
-                    films: res.data.results
+                    films: sortedFilms(res.data.results)
                 });
             })
             .catch(err => {
-                console.log('err', err);
+                this.setState({
+                    isDataError: true
+                });
             });
     }
-
-    handleOnChange = value => {
-        this.setState({ query: value }, () => {
-            this.getInfo();
-        });
-    };
 
     getInfo = () => {
         this.setState({
@@ -40,24 +40,43 @@ class AppContainer extends Component {
         });
         fetchCharacters(this.state.query)
             .then(res => {
-                console.log('characters', res.data.results);
                 this.setState({
                     characters: res.data.results,
                     isDataLoading: false
                 });
             })
             .catch(err => {
-                console.log('err', err);
+                this.setState({
+                    isDataError: true
+                });
             });
     };
 
+    handleOnChange = value => {
+        this.setState({ query: value }, () => {
+            this.getInfo();
+        });
+    };
+
     render() {
+        const { characters, films, isDataLoading, isDataError } = this.state;
         return (
             <div>
                 <SearchBar handleOnChange={this.handleOnChange} />
-                {!this.state.isDataLoading &&
-                    this.state.characters.map((character, index) => (
-                        <ResultItem key={index} results={character} />
+                {isDataError && (
+                    <div>Error loading data, please try again later</div>
+                )}
+                {!isDataLoading &&
+                    characters.map((character, index) => (
+                        <ResultItem
+                            key={index}
+                            characterName={character.name}
+                            characterDetails={getCharacterDetails(character)}
+                            characterFilms={getFilmsByCharacter(
+                                character,
+                                films
+                            )}
+                        />
                     ))}
             </div>
         );
