@@ -1,6 +1,24 @@
-import React, { Component } from 'react';
+import React from 'react';
+import styled from 'styled-components';
 
-class SearchBar extends Component {
+const StyledInput = styled.input`
+    border: none;
+    padding: 0 10px;
+    margin: 0 auto;
+    font-size: 1.2em;
+    width: 600px;
+    height: 40px;
+    color: #000;
+    background: #ccc;
+    border-radius: 4px;
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px maroon;
+    }
+`;
+
+class SearchBar extends React.Component {
     constructor(props) {
         super(props);
 
@@ -18,7 +36,7 @@ class SearchBar extends Component {
     render() {
         const { character } = this.state;
         return (
-            <input
+            <StyledInput
                 type="text"
                 name="character"
                 placeholder="Search Character"

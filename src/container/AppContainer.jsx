@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import Logo from '../components/Logo/Logo';
 import SearchBar from '../components/SearchBar/SearchBar';
 import ResultItem from '../components/ResultItem/ResultItem';
+import Spinner from '../components/Spinner/Spinner';
 import {
     sortedFilms,
     getFilmsByCharacter,
@@ -16,7 +18,8 @@ class AppContainer extends Component {
             query: '',
             characters: [],
             films: [],
-            isDataLoading: false
+            isDataLoading: false,
+            isDataError: false
         };
     }
 
@@ -62,11 +65,14 @@ class AppContainer extends Component {
         const { characters, films, isDataLoading, isDataError } = this.state;
         return (
             <div>
+                <Logo />
                 <SearchBar handleOnChange={this.handleOnChange} />
                 {isDataError && (
                     <div>Error loading data, please try again later</div>
                 )}
-                {!isDataLoading &&
+                {isDataLoading ? (
+                    <Spinner />
+                ) : (
                     characters.map((character, index) => (
                         <ResultItem
                             key={index}
@@ -77,7 +83,8 @@ class AppContainer extends Component {
                                 films
                             )}
                         />
-                    ))}
+                    ))
+                )}
             </div>
         );
     }
