@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import Axios from 'axios';
 import SearchBar from '../components/SearchBar/SearchBar';
+import ResultItem from '../components/ResultItem/ResultItem';
+import { fetchCharacters, fetchFilms } from '../utils/Network';
 
 class AppContainer extends Component {
     constructor(props) {
@@ -8,8 +9,23 @@ class AppContainer extends Component {
 
         this.state = {
             query: '',
-            characters: []
+            characters: [],
+            films: [],
+            isDataLoading: false
         };
+    }
+
+    componentDidMount() {
+        fetchFilms()
+            .then(res => {
+                console.log('films', res.data.results);
+                this.setState({
+                    films: res.data.results
+                });
+            })
+            .catch(err => {
+                console.log('err', err);
+            });
     }
 
     handleOnChange = value => {
@@ -19,11 +35,15 @@ class AppContainer extends Component {
     };
 
     getInfo = () => {
-        Axios.get(`https://swapi.co/api/people/?search=${this.state.query}`)
+        this.setState({
+            isDataLoading: true
+        });
+        fetchCharacters(this.state.query)
             .then(res => {
-                console.log('res.data.results', res.data.results);
+                console.log('characters', res.data.results);
                 this.setState({
-                    characters: res.data.results
+                    characters: res.data.results,
+                    isDataLoading: false
                 });
             })
             .catch(err => {
@@ -32,7 +52,15 @@ class AppContainer extends Component {
     };
 
     render() {
-        return <SearchBar handleOnChange={this.handleOnChange} />;
+        return (
+            <div>
+                <SearchBar handleOnChange={this.handleOnChange} />
+                {!this.state.isDataLoading &&
+                    this.state.characters.map((character, index) => (
+                        <ResultItem key={index} results={character} />
+                    ))}
+            </div>
+        );
     }
 }
 
