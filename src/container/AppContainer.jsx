@@ -19,11 +19,14 @@ class AppContainer extends Component {
             characters: [],
             films: [],
             isDataLoading: false,
-            isDataError: false
+            isDataError: false,
+            hasMoreData: false,
+            isScrolling: false
         };
     }
 
     componentDidMount() {
+        window.addEventListener('scroll', this.handleScroll);
         fetchFilms()
             .then(res => {
                 this.setState({
@@ -37,26 +40,58 @@ class AppContainer extends Component {
             });
     }
 
+    componentWillUnmount() {
+        window.removeEventListener('scroll', this.handleScroll);
+    }
+
+    handleScroll = () => {
+        const {
+            isDataError,
+            isDataLoading,
+            hasMoreData,
+            isScrolling
+        } = this.state;
+
+        if (isDataError || isDataLoading || isScrolling || !hasMoreData) return;
+
+        window.innerHeight + document.documentElement.scrollTop ===
+            document.documentElement.offsetHeight && this.getInfo();
+    };
+
     getInfo = () => {
-        this.setState({
-            isDataLoading: true
-        });
-        fetchCharacters(this.state.query)
-            .then(res => {
-                this.setState({
-                    characters: res.data.results,
-                    isDataLoading: false
-                });
-            })
-            .catch(err => {
-                this.setState({
-                    isDataError: true
-                });
-            });
+        const { query, characters } = this.state;
+        query &&
+            this.setState(
+                {
+                    isDataLoading: true,
+                    isScrolling: true
+                },
+                () =>
+                    fetchCharacters(query)
+                        .then(res => {
+                            this.setState({
+                                hasMoreData: res.data.next,
+                                characters: [
+                                    ...characters,
+                                    ...res.data.results
+                                ],
+                                query:
+                                    res.data.next &&
+                                    res.data.next.split('search=')[1],
+                                isDataLoading: false,
+                                isScrolling: false
+                            });
+                        })
+                        .catch(err => {
+                            this.setState({
+                                isDataError: true
+                            });
+                        })
+            );
     };
 
     handleOnChange = value => {
-        this.setState({ query: value }, () => {
+        this.setState({ query: value, characters: [] }, () => {
             this.getInfo();
         });
     };
@@ -67,23 +102,17 @@ class AppContainer extends Component {
             <div>
                 <Logo />
                 <SearchBar handleOnChange={this.handleOnChange} />
+                {characters.map((character, index) => (
+                    <ResultItem
+                        key={index}
+                        characterName={character.name}
+                        characterDetails={getCharacterDetails(character)}
+                        characterFilms={getFilmsByCharacter(character, films)}
+                    />
+                ))}
+                {isDataLoading && <Spinner />}
                 {isDataError && (
                     <div>Error loading data, please try again later</div>
-                )}
-                {isDataLoading ? (
-                    <Spinner />
-                ) : (
-                    characters.map((character, index) => (
-                        <ResultItem
-                            key={index}
-                            characterName={character.name}
-                            characterDetails={getCharacterDetails(character)}
-                            characterFilms={getFilmsByCharacter(
-                                character,
-                                films
-                            )}
-                        />
-                    ))
                 )}
             </div>
         );
