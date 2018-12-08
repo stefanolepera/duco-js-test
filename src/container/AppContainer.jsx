@@ -3,12 +3,15 @@ import Logo from '../components/Logo/Logo';
 import SearchBar from '../components/SearchBar/SearchBar';
 import ResultItem from '../components/ResultItem/ResultItem';
 import Spinner from '../components/Spinner/Spinner';
-import {
-    sortedFilms,
-    getFilmsByCharacter,
-    getCharacterDetails
-} from '../utils/FilterData';
+import { getFilmsByCharacter, getCharacterDetails } from '../utils/FilterData';
 import { fetchCharacters, fetchFilms } from '../utils/Network';
+import {
+    setLoadingState,
+    setLoadingErrorState,
+    setCharacterState,
+    setQueryState,
+    setFilmsState
+} from '../utils/StateChange';
 
 class AppContainer extends Component {
     constructor(props) {
@@ -29,14 +32,10 @@ class AppContainer extends Component {
         window.addEventListener('scroll', this.handleScroll);
         fetchFilms()
             .then(res => {
-                this.setState({
-                    films: sortedFilms(res.data.results)
-                });
+                this.handleFilmsState(res);
             })
-            .catch(err => {
-                this.setState({
-                    isDataError: true
-                });
+            .catch(() => {
+                this.handleLoadingErrorState();
             });
     }
 
@@ -55,45 +54,32 @@ class AppContainer extends Component {
         if (isDataError || isDataLoading || isScrolling || !hasMoreData) return;
 
         window.innerHeight + document.documentElement.scrollTop ===
-            document.documentElement.offsetHeight && this.getInfo();
+            document.documentElement.offsetHeight && this.handleLoadingState();
     };
 
-    getInfo = () => {
-        const { query, characters } = this.state;
-        query &&
-            this.setState(
-                {
-                    isDataLoading: true,
-                    isScrolling: true
-                },
-                () =>
-                    fetchCharacters(query)
-                        .then(res => {
-                            this.setState({
-                                hasMoreData: res.data.next,
-                                characters: [
-                                    ...characters,
-                                    ...res.data.results
-                                ],
-                                query:
-                                    res.data.next &&
-                                    res.data.next.split('search=')[1],
-                                isDataLoading: false,
-                                isScrolling: false
-                            });
-                        })
-                        .catch(err => {
-                            this.setState({
-                                isDataError: true
-                            });
-                        })
-            );
+    handleLoadingState = () => {
+        const { query } = this.state;
+        query && this.setState(setLoadingState, () => this.fetchCharacters());
     };
 
-    handleOnChange = value => {
-        this.setState({ query: value, characters: [] }, () => {
-            this.getInfo();
-        });
+    handleLoadingErrorState = () => this.setState(setLoadingErrorState);
+
+    handleCharactersState = res => this.setState(setCharacterState(res));
+
+    handleFilmsState = res => this.setState(setFilmsState(res));
+
+    handleQueryState = value =>
+        this.setState(setQueryState(value), () => this.handleLoadingState());
+
+    fetchCharacters = () => {
+        const { query } = this.state;
+        fetchCharacters(query)
+            .then(res => {
+                this.handleCharactersState(res);
+            })
+            .catch(() => {
+                this.handleLoadingErrorState();
+            });
     };
 
     render() {
@@ -101,7 +87,7 @@ class AppContainer extends Component {
         return (
             <div>
                 <Logo />
-                <SearchBar handleOnChange={this.handleOnChange} />
+                <SearchBar handleOnChange={this.handleQueryState} />
                 {characters.map((character, index) => (
                     <ResultItem
                         key={index}
