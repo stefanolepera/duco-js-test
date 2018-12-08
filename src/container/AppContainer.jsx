@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import Logo from '../components/Logo/Logo';
 import SearchBar from '../components/SearchBar/SearchBar';
 import ResultItem from '../components/ResultItem/ResultItem';
@@ -7,6 +8,7 @@ import { getFilmsByCharacter, getCharacterDetails } from '../utils/FilterData';
 import { fetchCharacters, fetchFilms } from '../utils/Network';
 import {
     setLoadingState,
+    setLoadingCancelState,
     setLoadingErrorState,
     setCharacterState,
     setQueryState,
@@ -59,7 +61,9 @@ class AppContainer extends Component {
 
     handleLoadingState = () => {
         const { query } = this.state;
-        query && this.setState(setLoadingState, () => this.fetchCharacters());
+        query
+            ? this.setState(setLoadingState, () => this.fetchCharacters())
+            : this.setState(setLoadingCancelState, () => axios.cancelAll());
     };
 
     handleLoadingErrorState = () => this.setState(setLoadingErrorState);
@@ -73,7 +77,7 @@ class AppContainer extends Component {
 
     fetchCharacters = () => {
         const { query } = this.state;
-        fetchCharacters(query)
+        fetchCharacters(query, 'fetch_characters')
             .then(res => {
                 this.handleCharactersState(res);
             })
