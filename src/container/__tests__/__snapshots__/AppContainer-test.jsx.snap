@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ResultItem /> test Test snapshots of content 1`] = `
+<div>
+  <Logo />
+  <SearchBar
+    handleOnChange={[Function]}
+  />
+</div>
+`;

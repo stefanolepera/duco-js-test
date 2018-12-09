@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Logo /> test Test snapshots of content 1`] = `
+<styled.div>
+  <img
+    alt="Star"
+    src="https://cssanimation.rocks/demo/starwars/images/star.svg"
+  />
+  <img
+    alt="Wars"
+    src="https://cssanimation.rocks/demo/starwars/images/wars.svg"
+  />
+</styled.div>
+`;

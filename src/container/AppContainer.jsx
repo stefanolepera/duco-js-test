@@ -25,7 +25,7 @@ class AppContainer extends Component {
             films: [],
             isDataLoading: false,
             isDataError: false,
-            hasMoreData: false,
+            hasMoreData: null,
             isScrolling: false
         };
     }
@@ -52,8 +52,12 @@ class AppContainer extends Component {
             hasMoreData,
             isScrolling
         } = this.state;
-
-        if (isDataError || isDataLoading || isScrolling || !hasMoreData) return;
+        console.log('isDataError', isDataError);
+        console.log('isDataLoading', isDataLoading);
+        console.log('isScrolling', isScrolling);
+        console.log('hasMoreData', hasMoreData);
+        if (isDataError || isDataLoading || isScrolling || hasMoreData === null)
+            return;
 
         window.innerHeight + document.documentElement.scrollTop ===
             document.documentElement.offsetHeight && this.handleLoadingState();
@@ -81,8 +85,8 @@ class AppContainer extends Component {
             .then(res => {
                 this.handleCharactersState(res);
             })
-            .catch(() => {
-                this.handleLoadingErrorState();
+            .catch(res => {
+                res.status === undefined && this.handleLoadingErrorState();
             });
     };
 

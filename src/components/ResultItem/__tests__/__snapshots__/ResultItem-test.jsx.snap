@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ResultItem /> test Test snapshots of content 1`] = `
+<styled.div>
+  <Title
+    title=""
+  />
+  <hr />
+  <styled.div>
+    <styled.div>
+      <SubTitle
+        subTitle="Details"
+      />
+      <hr />
+    </styled.div>
+    <styled.div>
+      <SubTitle
+        subTitle="Films"
+      />
+    </styled.div>
+  </styled.div>
+</styled.div>
+`;
