@@ -52,10 +52,7 @@ class AppContainer extends Component {
             hasMoreData,
             isScrolling
         } = this.state;
-        console.log('isDataError', isDataError);
-        console.log('isDataLoading', isDataLoading);
-        console.log('isScrolling', isScrolling);
-        console.log('hasMoreData', hasMoreData);
+
         if (isDataError || isDataLoading || isScrolling || hasMoreData === null)
             return;
 
