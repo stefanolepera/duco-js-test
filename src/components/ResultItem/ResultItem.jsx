@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 import Title from './components/Title/Title';
 import SubTitle from './components/SubTitle/SubTitle';
 import { formatDetail } from '../../utils/FilterData';
@@ -48,5 +49,11 @@ const ResultItem = ({ characterName, characterDetails, characterFilms }) => (
         </ContentWrapper>
     </MainWrapper>
 );
+
+ResultItem.propTypes = {
+    characterName: PropTypes.string,
+    characterDetails: PropTypes.arrayOf(PropTypes.array),
+    characterFilms: PropTypes.arrayOf(PropTypes.string)
+};
 
 export default ResultItem;
