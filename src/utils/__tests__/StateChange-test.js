@@ -41,16 +41,6 @@ describe('StateChange test', () => {
             isScrolling: false });
     })
 
-    it('setCharacterState should return the correct state if there are not more pages', () => {
-        expect(setCharacterState(singleCharacterResponse)([])).toEqual({ 
-            hasMoreData: null,
-            characters: singleCharacterResponse.data.results,
-            query: null,
-            isDataLoading: false,
-            isDataError: false,
-            isScrolling: false });
-    })
-
     it('setCharacterState should return the correct state if there are more pages', () => {
         expect(setCharacterState(multipleCharactersResponse)([])).toEqual({ 
             hasMoreData: 'https://swapi.co/api/people/?search=l&page=2',
