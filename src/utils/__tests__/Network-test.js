@@ -5,13 +5,12 @@ import { singleCharacterResponse } from '../../__mocks__/CharacterResponseMock';
 import { filmsResponse } from '../../__mocks__/FilmsResponseMock';
 
 describe('Network test', () => {
-
     beforeEach(function () {
         moxios.install();
     })
   
     afterEach(function () {
-    moxios.uninstall();
+        moxios.uninstall();
     })
 
     it('fetchCharacters get request should be called', () => {
